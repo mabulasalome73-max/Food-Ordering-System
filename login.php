@@ -1,50 +1,112 @@
 <?php
-session_start();
-require_once 'config/db.php';
+// Start of the file
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+// Start session securely
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-    // We are using $pdo because that is how you defined it in your db.php
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch();
+// Check if login button is clicked
+if (isset($_POST['login'])) {
 
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['user_id'];
-        $_SESSION['full_name'] = $user['full_name'];
-        echo "<script>alert('Success! Welcome " . $user['full_name'] . "'); window.location='index.php';</script>";
+    // Use trim() to clean email and password inputs
+    $user = trim($_POST['username']);
+    $pass = trim($_POST['password']);
+
+    // NOTE: We are NOT checking the database here.
+    // We are using fixed credentials directly.
+    if ($user === "mabulasalome73@gmail.com" && $pass === "12345678") {
+
+        $_SESSION['admin_logged_in'] = true;
+
+        echo "<script>
+                alert('Login Successful! Welcome Admin.');
+                window.location.replace('admin_dashboard.php');
+              </script>";
+        exit();
+
     } else {
-        echo "<script>alert('Incorrect Email or Password!');</script>";
+
+        echo "<script>
+                alert('Error: Email or Password is incorrect!');
+                window.location.replace('login.php');
+              </script>";
+        exit();
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login - Food System</title>
+    <meta charset="UTF-8">
+    <title>Admin Login</title>
+
     <style>
-        body { font-family: Arial; background-color: #f4f4f4; text-align: center; padding-top: 50px; }
-        .login-box { background: white; width: 300px; margin: auto; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px gray; }
-        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; }
-        button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; cursor: pointer; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 350px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #27ae60;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #219150;
+        }
     </style>
 </head>
+
 <body>
+
     <div class="login-box">
-        <h2>Login</h2>
-        <form method="POST">
-            <input type="email" name="email" placeholder="Enter Email" required>
-            <input type="password" name="password" placeholder="Enter Password" required>
-            <button type="submit">Login</button>
+        <h2>Admin Login</h2>
+
+        <form method="POST" action="login.php">
+            <input type="email" name="username" value="mabulasalome73@gmail.com" required>
+            <input type="password" name="password" placeholder="Enter 12345678" required>
+            <button type="submit" name="login">LOGIN NOW</button>
         </form>
+
     </div>
+
 </body>
 </html>
-
-
-
-
-
